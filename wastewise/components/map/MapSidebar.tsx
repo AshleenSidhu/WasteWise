@@ -45,24 +45,39 @@ export default function MapSidebar({ selectedBin, onClose, onOpenDirections, onS
     if (selectedBin && closeRef.current) closeRef.current.focus();
   }, [selectedBin]);
 
-  return (
+  const getBinTypeColor = (type: string) => {
+    switch (type.toLowerCase()) {
+      case "trash":
+        return "#1f2937" // dark gray/black
+      case "recycling":
+        return "#2563eb" // blue
+      case "compost":
+        return "#16a34a" // green
+      default:
+        return "#16a34a" // default green
+    }
+  }
+
+return (
     <nav className={`ww-sidebar ${className}`} style={{ width }} aria-label="Map sidebar">
       <div className="ww-sidebar__header">
-        <h2 className="ww-sidebar__title">WasteWiser Map</h2>
-        <p className="ww-sidebar__lead">Click a bin on the map to view its address and details. Use Directions to navigate (opens Google Maps).</p>
+        <h2 className="ww-sidebar__title">Map</h2>
+        <p className="ww-sidebar__lead">
+          Click a bin on the map to view its address and details. Use Directions to navigate (opens Google Maps).
+        </p>
 
         {/* Search bar */}
         <div className="ww-sidebar__search">
           <input
             className="ww-search-input"
-            placeholder="Search address or tag"
+            placeholder="🔍 Search address..."
             value={query}
             onChange={(e) => {
-              const v = e.target.value;
-              setQuery(v);
-              if (onSearch) onSearch(v);
+              const v = e.target.value
+              setQuery(v)
+              if (onSearch) onSearch(v)
             }}
-            aria-label="Search bins by address or tag"
+            aria-label="Search bins by address"
           />
         </div>
 
@@ -73,14 +88,16 @@ export default function MapSidebar({ selectedBin, onClose, onOpenDirections, onS
               key={f.key}
               className={`ww-filter-btn ${activeFilter === f.key ? "ww-filter-btn--active" : ""}`}
               onClick={() => {
-                const next = activeFilter === f.key ? null : f.key;
-                setActiveFilter(next);
-                if (onFilterChange) onFilterChange(next);
+                const next = activeFilter === f.key ? null : f.key
+                setActiveFilter(next)
+                if (onFilterChange) onFilterChange(next)
               }}
               aria-pressed={activeFilter === f.key}
               title={f.label}
             >
-              <span className="ww-filter-icon" aria-hidden>{f.icon}</span>
+              <span className="ww-filter-icon" aria-hidden style={{ fontSize: "24px" }}>
+                {f.icon}
+              </span>
               <span className="ww-filter-label">{f.label}</span>
             </button>
           ))}
@@ -100,19 +117,25 @@ export default function MapSidebar({ selectedBin, onClose, onOpenDirections, onS
         <div className="ww-sidebar__details">
           <div className="ww-sidebar__row">
             <div>
-              <h3>Bin details</h3>
-              <div className="ww-sidebar__type">{selectedBin.type.toUpperCase()}</div>
+              <h3>📍 Bin details</h3>
+              <div className="ww-sidebar__type" style={{ background: getBinTypeColor(selectedBin.type) }}>
+                {selectedBin.type.toUpperCase()}
+              </div>
               <div className="ww-sidebar__address">{selectedBin.address ?? "No address available"}</div>
               {selectedBin.city ? <div className="ww-sidebar__city">{selectedBin.city}</div> : null}
             </div>
-            <button ref={closeRef} onClick={onClose} aria-label="Close details" className="ww-sidebar__close">✕</button>
+            <button ref={closeRef} onClick={onClose} aria-label="Close details" className="ww-sidebar__close">
+              ✕
+            </button>
           </div>
 
           <div className="ww-sidebar__actions">
-            <button onClick={onOpenDirections} className="ww-btn ww-btn--primary">Open directions</button>
+            <button onClick={onOpenDirections} className="ww-btn ww-btn--primary">
+              Open directions
+            </button>
           </div>
         </div>
       )}
     </nav>
-  );
+  )
 }
