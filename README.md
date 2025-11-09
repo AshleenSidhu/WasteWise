@@ -11,11 +11,8 @@ WasteWise uses **OpenStreetMap data (via Overpass API)** to find real waste bin 
 
 - **Locate Nearby Bins:** Find the closest waste, recycling, and compost bins around your current or searched location.
 - **Interactive Map UI:** Smooth zooming, search, panning, and mobile-friendly controls via Mapbox.
-- **Bin Type Icons:** Different marker styles for trash vs. recycling vs. compost.
 - **Search Any Address:** Use the built-in location search to find bins in any neighborhood.
-- **OSM-Powered Data:** Real, open-source bin data fetched directly from OpenStreetMap.
 - **Add & Report Bins (Optional):** Community-driven reporting to identify missing or overflowing bins.
-- **Account System (Team Member Feature):** Login, saved locations, and user report history (optional if implemented).
 
 ---
 
