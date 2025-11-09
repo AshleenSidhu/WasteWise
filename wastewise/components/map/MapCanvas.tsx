@@ -3,9 +3,6 @@
 import {useEffect, useRef, useState} from "react";
 import mapboxgl from "mapbox-gl";
 import 'mapbox-gl/dist/mapbox-gl.css';
-import "@mapbox/mapbox-gl-geocoder/dist/mapbox-gl-geocoder.css";
-// @ts-expect-error: no type declarations for this module
-import MapboxGeocoder from "@mapbox/mapbox-gl-geocoder";
 import MapContext from "./MapContext";
 
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
@@ -39,23 +36,8 @@ export default function MapCanvas({onViewport, children}: Props) {
     mapRef.current = map;
     setMapInstance(map);
 
-        //Add a locate me control
-        const geolocate = new mapboxgl.GeolocateControl({
-            positionOptions: {enableHighAccuracy: true},
-            trackUserLocation: true,
-            showUserHeading: true
-        });
-
-        map.addControl(geolocate, "top-right");
-
-        //Add search bar from Mapbox geolocator
-        const geocoder = new MapboxGeocoder({
-            accessToken: mapboxgl.accessToken,
-            mapboxgl: mapboxgl,
-            marker: false,
-            placeholder: "Search address"
-        });
-        map.addControl(geocoder, "top-left");
+        // Note: map-level search/geolocate controls removed.
+        // Search and filtering are provided in the sidebar component instead.
 
     //Let the app know that the user is done zooming
         // remember last viewport we reported so we don't notify parent of identical programmatic moves

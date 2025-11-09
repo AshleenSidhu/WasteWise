@@ -1,11 +1,10 @@
 "use client"
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import MapCanvas from "../../components/map/MapCanvas";
 import BinMarkers from "../../components/map/BinMarkers";
-import LocateMeControl from "../../components/map/LocateMeControl";
-import AddBinControl from "../../components/map/AddBinControl";
-import FilterControl from "../../components/map/FilterControl";
+import MapSidebar from "../../components/map/MapSidebar";
+// map corner controls removed: locate/add/filter controls moved into sidebar
 import type { Bin } from "../../components/map/types";
 import { useMap } from "../../components/map/MapContext";
 
@@ -41,9 +40,10 @@ export default function MapPage() {
 			zoom: number;
 		} | null>(null);
 		const [visibleTypes, setVisibleTypes] = useState<Bin["type"][]>(["recycle", "compost", "landfill"]);
+		const [searchQuery, setSearchQuery] = useState("");
 
 		// user-created / local bins
-		const [userBins, setUserBins] = useState<Bin[]>([
+		const [userBins] = useState<Bin[]>([
 			{
 				binId: "local-uuid",
 				type: "recycle",
@@ -64,22 +64,7 @@ export default function MapPage() {
 		const abortRef = useRef<AbortController | null>(null);
 		const debounceRef = useRef<number | null>(null);
 
-	const handleAdd = useCallback((draft: Partial<Bin>) => {
-		const newBin: Bin = {
-			binId: String(Date.now()),
-			type: draft.type ?? "landfill",
-			coordinates: draft.coordinates ?? { lat: 51.0486, lng: -114.0708 },
-			address: draft.address,
-			fullnessLevel: draft.fullnessLevel,
-			accessibility: draft.accessibility,
-			city: draft.city,
-			createdAt: Date.now(),
-			createdBy: "local",
-			lastCheckedAt: draft.lastCheckedAt,
-			status: draft.status ?? "active",
-		};
-		setUserBins((b) => [newBin, ...b]);
-	}, []);
+	// (Add bin action previously provided by a map-corner control removed.)
 
 	// Compute distance (meters) between two lat/lng points (Haversine)
 	const haversineMeters = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -232,48 +217,39 @@ useEffect(() => {
 	return (
 		<div style={{ width: "100%", height: "100vh" }}>
 			<div style={{ display: "flex", height: "100%" }}>
-				<aside style={{ width: 320, padding: 18, borderRight: "1px solid rgba(0,0,0,0.06)", boxSizing: "border-box", background: "#fafafa" }}>
-					<h2 style={{ margin: 0, fontSize: 20 }}>WasteWiser Map</h2>
-					<p style={{ marginTop: 8, marginBottom: 12, color: "#444", fontSize: 13 }}>Click a bin on the map to view its address and details. Use the Directions button to open navigation (coming soon).</p>
-
-					{!selectedBin ? (
-						<div style={{ marginTop: 12, color: "#333" }}>
-							<h3 style={{ marginTop: 0, fontSize: 15 }}>How to use</h3>
-							<ol style={{ paddingLeft: 18 }}>
-								<li>Pan / zoom the map to your area.</li>
-								<li>Click a bin marker (grey circle) to see its address and tags.</li>
-								<li>Press Directions to get navigation (not implemented yet).</li>
-							</ol>
-						</div>
-					) : (
-						<div style={{ marginTop: 12 }}>
-							<div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
-								<div>
-									<h3 style={{ margin: 0, fontSize: 16 }}>Bin details</h3>
-									<div style={{ marginTop: 8, color: "#333" }}>
-										<div style={{ fontSize: 14, fontWeight: 600 }}>{selectedBin.type.toUpperCase()}</div>
-										<div style={{ marginTop: 6 }}>{selectedBin.address ?? "No address available"}</div>
-										{selectedBin.city ? <div style={{ color: "#666", marginTop: 6 }}>{selectedBin.city}</div> : null}
-									</div>
-								</div>
-								<button onClick={() => setSelectedBin(null)} aria-label="Close" style={{ border: "none", background: "transparent", fontSize: 18, cursor: "pointer" }}>✕</button>
-							</div>
-
-							<div style={{ marginTop: 16 }}>
-								<button onClick={openDirections} style={{ background: "#0ea5e9", color: "white", border: "none", padding: "10px 14px", borderRadius: 8, cursor: "pointer", fontWeight: 600 }}>Open directions</button>
-							</div>
-						</div>
-					)}
-				</aside>
+				<MapSidebar
+					selectedBin={selectedBin}
+					onClose={() => setSelectedBin(null)}
+					onOpenDirections={openDirections}
+					onSearch={(q) => setSearchQuery(q)}
+					onFilterChange={(type) => {
+						if (!type) {
+							setVisibleTypes(["recycle", "compost", "landfill"]);
+							return;
+						}
+						if (type === "trash") setVisibleTypes(["landfill"]);
+						else if (type === "recycling") setVisibleTypes(["recycle"]);
+						else if (type === "compost") setVisibleTypes(["compost"]);
+					}}
+				/>
 
 				<div style={{ flex: 1, position: "relative" }}>
 					<MapCanvas onViewport={(v) => setViewport(v)}>
 						{/* apply user location when available */}
 						{userLocation ? <ApplyUserLocation loc={userLocation} /> : null}
-						<FilterControl visibleTypes={visibleTypes} onChange={setVisibleTypes} />
-						<LocateMeControl />
-						<AddBinControl onAdd={handleAdd} />
-						<BinMarkers bins={[...userBins, ...osmBins]} visibleTypes={visibleTypes} onBinClick={(b) => setSelectedBin(b)} />
+						{/* BinMarkers receives bins filtered by visibleTypes and searchQuery */}
+						{(() => {
+							const q = searchQuery.trim().toLowerCase();
+							const all = [...userBins, ...osmBins];
+							const filtered = all.filter(b => {
+								if (!visibleTypes.includes(b.type)) return false;
+								if (!q) return true;
+								const addr = (b.address ?? "").toLowerCase();
+								const city = (b.city ?? "").toLowerCase();
+								return addr.includes(q) || city.includes(q) || b.type.includes(q);
+							});
+							return <BinMarkers bins={filtered} visibleTypes={visibleTypes} onBinClick={(b) => setSelectedBin(b)} />;
+						})()}
 					</MapCanvas>
 				</div>
 			</div>
