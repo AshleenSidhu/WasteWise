@@ -1,5 +1,5 @@
-import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
-import { postConfirmation } from "../auth/post-confirmation/resource";
+//import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
+//import { postConfirmation } from "../auth/post-confirmation/resource";
 /*== STEP 1 ===============================================================
 Create a data resource to hold your Amplify Client Schema
 =========================================================================*/
