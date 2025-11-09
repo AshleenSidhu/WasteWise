@@ -27,8 +27,8 @@ WasteWise uses **OpenStreetMap data (via Overpass API)** to find real waste bin 
 | Map Rendering | Mapbox GL JS |
 | Bin Data Source | OpenStreetMap via Overpass API |
 | Geocoding & Location Search | Mapbox Geocoder |
-| Authentication (Optional) | AWS Cognito / Supabase Auth / Firebase Auth |
-| Reporting & User Data (Optional) | DynamoDB / Supabase / MongoDB Atlas |
+| Authentication | AWS Cognito |
+| Reporting & User Data | DynamoDB |
 
 ---
 
