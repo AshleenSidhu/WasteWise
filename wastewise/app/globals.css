@@ -66,3 +66,10 @@ body {
 
 
 
+/* Styles for BinMarkers popups */
+.ww-bin-popup .mapboxgl-popup-content { color: #000 !important; }
+.ww-bin-popup .mapboxgl-popup-close-button { font-size: 20px !important; width: 34px !important; height: 34px !important; line-height: 34px !important; color: #000 !important; }
+
+
+
+
