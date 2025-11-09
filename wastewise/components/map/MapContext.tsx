@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from "react";
+import { createContext, useContext } from "react";
 import mapboxgl from "mapbox-gl";
 
 export type MapContextShape = { map: mapboxgl.Map | null; ready: boolean };
